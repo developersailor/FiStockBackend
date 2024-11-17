@@ -1,0 +1,70 @@
+@FiStockBackend_HostAddress = http://localhost:5092
+
+# Login
+###
+POST http://localhost:5092/api/auth/login
+Content-Type: application/json
+{
+    "username": "your-username",
+    "password": "your-password"
+}
+
+
+# Register
+###
+POST http://localhost:5092/api/auth/register
+Content-Type: application/json
+{
+    "username": "sevket",
+    "password": "Rootme17*"
+}
+
+
+
+# Get all products
+###
+GET http://localhost:5092/api/product
+Accept: application/json
+
+
+# Get a specific product by ID
+###
+GET http://localhost:5092/api/product/1
+Accept: application/json
+
+
+# Add a new product
+###
+POST http://localhost:5092/api/product
+Content-Type: application/json
+{
+    "productName": "New Product",
+    "categoryId": 1,
+    "barcode": "123456789",
+    "unit": "pcs",
+    "purchasePrice": 10.99,
+    "salePrice": 15.99,
+    "minimumStockLevel": 5
+}
+
+
+# Update an existing product
+###
+PUT http://localhost:5092/api/product/1
+Content-Type: application/json
+{
+    "productCode": 1,
+    "productName": "Updated Product",
+    "categoryId": 1,
+    "barcode": "987654321",
+    "unit": "pcs",
+    "purchasePrice": 12.99,
+    "salePrice": 18.99,
+    "minimumStockLevel": 10
+}
+
+
+
+# Delete a product by ID
+###
+DELETE http://localhost:5092/api/product/1
