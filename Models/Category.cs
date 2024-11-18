@@ -1,9 +1,8 @@
 namespace FiStockBackend.Models;
 
-
 public class Category
 {
-    public int CategoryId { get; set; } // Primary Key
+    public int CategoryId { get; set; } // Primary key
     public required string CategoryName { get; set; }
-    public required List<Product> Products { get; set; } // Navigation Property
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }

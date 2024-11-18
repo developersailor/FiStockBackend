@@ -7,4 +7,5 @@ public class Warehouse
     public required string Address { get; set; }
     public required string ResponsiblePerson { get; set; }
     public required string WarehouseCode { get; set; }
+    public ICollection<StockMovement> StockMovements { get; set; } = new List<StockMovement>();
 }

@@ -14,7 +14,7 @@ public class StockTrackingDbContext : DbContext
     public DbSet<Warehouse> Warehouses { get; set; } = null!;
     public DbSet<Supplier> Suppliers { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
-    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Lot> Lots { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +30,8 @@ public class StockTrackingDbContext : DbContext
             .HasKey(sm => sm.StockMovementId);
         modelBuilder.Entity<Warehouse>()
             .HasKey(w => w.WarehouseId);
+        modelBuilder.Entity<Lot>()
+            .HasKey(l => l.LotId);
 
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)
@@ -42,8 +44,8 @@ public class StockTrackingDbContext : DbContext
             .HasForeignKey(sm => sm.ProductId);
 
         modelBuilder.Entity<StockMovement>()
-            .HasOne<Warehouse>()
-            .WithMany()
+            .HasOne(sm => sm.SourceDestination)
+            .WithMany(w => w.StockMovements)
             .HasForeignKey(sm => sm.SourceDestinationId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -51,6 +53,11 @@ public class StockTrackingDbContext : DbContext
             .HasOne(p => p.Supplier)
             .WithMany()
             .HasForeignKey(p => p.SupplierId);
+
+        modelBuilder.Entity<Product>()
+            .HasMany(p => p.Lots)
+            .WithOne(l => l.Product)
+            .HasForeignKey(l => l.ProductId);
 
         modelBuilder.Entity<Supplier>()
             .Property(s => s.SupplierCode)

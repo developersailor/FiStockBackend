@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FiStockBackend.Context;
 using FiStockBackend.Models;
+using FiStockBackend.DTO;
 
 namespace FiStockBackend.Controllers
 {
@@ -76,12 +77,21 @@ namespace FiStockBackend.Controllers
         // POST: api/Supplier
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Supplier>> PostSupplier(Supplier supplier)
+        public async Task<ActionResult<SupplierDTO>> PostSupplier(SupplierDTO supplierDto)
         {
+            var supplier = new Supplier
+            {
+                SupplierCode = supplierDto.SupplierCode,
+                SupplierName = supplierDto.SupplierName,
+                ContactInformation = supplierDto.ContactInformation
+            };
+
             _context.Suppliers.Add(supplier);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSupplier", new { id = supplier.SupplierId }, supplier);
+            supplierDto.SupplierId = supplier.SupplierId;
+
+            return CreatedAtAction(nameof(GetSupplier), new { id = supplierDto.SupplierId }, supplierDto);
         }
 
         // DELETE: api/Supplier/5

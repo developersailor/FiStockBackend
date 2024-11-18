@@ -7,53 +7,52 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FiStockBackend.Context;
 using FiStockBackend.Models;
-using FiStockBackend.DTO;
 
 namespace FiStockBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CustomerController : ControllerBase
     {
         private readonly StockTrackingDbContext _context;
 
-        public CategoryController(StockTrackingDbContext context)
+        public CustomerController(StockTrackingDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Category
+        // GET: api/Customer
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Customers.ToListAsync();
         }
 
-        // GET: api/Category/5
+        // GET: api/Customer/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(int id)
+        public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var customer = await _context.Customers.FindAsync(id);
 
-            if (category == null)
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            return category;
+            return customer;
         }
 
-        // PUT: api/Category/5
+        // PUT: api/Customer/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
-            if (id != category.CategoryId)
+            if (id != customer.CustomerId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(category).State = EntityState.Modified;
+            _context.Entry(customer).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +60,7 @@ namespace FiStockBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CategoryExists(id))
+                if (!CustomerExists(id))
                 {
                     return NotFound();
                 }
@@ -74,43 +73,36 @@ namespace FiStockBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/Category
+        // POST: api/Customer
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CategoryDTO>> PostCategory(CategoryDTO categoryDto)
+        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
-            var category = new Category
-            {
-                CategoryName = categoryDto.CategoryName
-            };
-
-            _context.Categories.Add(category);
+            _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
-            categoryDto.CategoryId = category.CategoryId;
-
-            return CreatedAtAction(nameof(GetCategory), new { id = categoryDto.CategoryId }, categoryDto);
+            return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
 
-        // DELETE: api/Category/5
+        // DELETE: api/Customer/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            _context.Categories.Remove(category);
+            _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CategoryExists(int id)
+        private bool CustomerExists(int id)
         {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            return _context.Customers.Any(e => e.CustomerId == id);
         }
     }
 }

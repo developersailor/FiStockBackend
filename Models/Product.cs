@@ -13,4 +13,6 @@ public class Product
     public ICollection<StockMovement> StockMovements { get; set; } = new List<StockMovement>();
     public required string Unit { get; set; }
     public required string SKU { get; set; }
+    public required decimal UnitPrice { get; set; }
+    public ICollection<Lot> Lots { get; set; } = new List<Lot>();
 }

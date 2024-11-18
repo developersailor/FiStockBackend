@@ -3,6 +3,7 @@ using System;
 using FiStockBackend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FiStockBackend.Migrations
 {
     [DbContext(typeof(StockTrackingDbContext))]
-    partial class StockTrackingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241118230610_kasim-19-02-06")]
+    partial class kasim190206
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

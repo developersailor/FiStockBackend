@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FiStockBackend.Context;
 using FiStockBackend.Models;
+using FiStockBackend.DTO;
 
 namespace FiStockBackend.Controllers
 {
@@ -52,6 +53,18 @@ namespace FiStockBackend.Controllers
                 return BadRequest();
             }
 
+            // Validate CategoryId
+            if (!await _context.Categories.AnyAsync(c => c.CategoryId == product.CategoryId))
+            {
+                return BadRequest("Invalid CategoryId");
+            }
+
+            // Validate SupplierId
+            if (!await _context.Suppliers.AnyAsync(s => s.SupplierId == product.SupplierId))
+            {
+                return BadRequest("Invalid SupplierId");
+            }
+
             _context.Entry(product).State = EntityState.Modified;
 
             try
@@ -76,12 +89,38 @@ namespace FiStockBackend.Controllers
         // POST: api/Product
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<ProductDTO>> PostProduct(ProductDTO productDto)
         {
+            // Validate CategoryId
+            if (!await _context.Categories.AnyAsync(c => c.CategoryId == productDto.CategoryId))
+            {
+                return BadRequest("Invalid CategoryId");
+            }
+
+            // Validate SupplierId
+            if (!await _context.Suppliers.AnyAsync(s => s.SupplierId == productDto.SupplierId))
+            {
+                return BadRequest("Invalid SupplierId");
+            }
+
+            var product = new Product
+            {
+                ProductCode = productDto.ProductCode,
+                Barcode = productDto.Barcode,
+                ProductName = productDto.ProductName,
+                SKU = productDto.SKU,
+                Unit = productDto.Unit,
+                UnitPrice = productDto.UnitPrice,
+                SupplierId = productDto.SupplierId,
+                CategoryId = productDto.CategoryId
+            };
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+            productDto.ProductId = product.ProductId;
+
+            return CreatedAtAction(nameof(GetProduct), new { id = productDto.ProductId }, productDto);
         }
 
         // DELETE: api/Product/5

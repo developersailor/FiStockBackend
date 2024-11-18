@@ -3,6 +3,7 @@ using System;
 using FiStockBackend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FiStockBackend.Migrations
 {
     [DbContext(typeof(StockTrackingDbContext))]
-    partial class StockTrackingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241118171624_kasim-18-20-16")]
+    partial class kasim182016
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,31 +63,6 @@ namespace FiStockBackend.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("FiStockBackend.Models.Lot", b =>
-                {
-                    b.Property<int>("LotId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LotId"));
-
-                    b.Property<DateTime>("ExpiryDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LotNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("LotId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Lots");
-                });
-
             modelBuilder.Entity("FiStockBackend.Models.Product", b =>
                 {
                     b.Property<int>("ProductId")
@@ -118,9 +96,6 @@ namespace FiStockBackend.Migrations
                     b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric");
 
                     b.HasKey("ProductId");
 
@@ -199,6 +174,27 @@ namespace FiStockBackend.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("FiStockBackend.Models.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("FiStockBackend.Models.Warehouse", b =>
                 {
                     b.Property<int>("WarehouseId")
@@ -228,17 +224,6 @@ namespace FiStockBackend.Migrations
                     b.ToTable("Warehouses");
                 });
 
-            modelBuilder.Entity("FiStockBackend.Models.Lot", b =>
-                {
-                    b.HasOne("FiStockBackend.Models.Product", "Product")
-                        .WithMany("Lots")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("FiStockBackend.Models.Product", b =>
                 {
                     b.HasOne("FiStockBackend.Models.Category", "Category")
@@ -266,15 +251,13 @@ namespace FiStockBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FiStockBackend.Models.Warehouse", "SourceDestination")
-                        .WithMany("StockMovements")
+                    b.HasOne("FiStockBackend.Models.Warehouse", null)
+                        .WithMany()
                         .HasForeignKey("SourceDestinationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Product");
-
-                    b.Navigation("SourceDestination");
                 });
 
             modelBuilder.Entity("FiStockBackend.Models.Category", b =>
@@ -283,13 +266,6 @@ namespace FiStockBackend.Migrations
                 });
 
             modelBuilder.Entity("FiStockBackend.Models.Product", b =>
-                {
-                    b.Navigation("Lots");
-
-                    b.Navigation("StockMovements");
-                });
-
-            modelBuilder.Entity("FiStockBackend.Models.Warehouse", b =>
                 {
                     b.Navigation("StockMovements");
                 });

@@ -10,6 +10,7 @@ public class StockMovement
     public decimal UnitPrice { get; set; }
     public decimal TotalAmount { get; set; }
     public int SourceDestinationId { get; set; }
+    public Warehouse SourceDestination { get; set; } = null!;
     public string Description { get; set; } = null!;
     public string TransactionType { get; set; } = null!;
 }

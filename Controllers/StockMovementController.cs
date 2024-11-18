@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FiStockBackend.Context;
 using FiStockBackend.Models;
+using FiStockBackend.DTO;
 
 namespace FiStockBackend.Controllers
 {
@@ -23,16 +24,42 @@ namespace FiStockBackend.Controllers
 
         // GET: api/StockMovement
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StockMovement>>> GetStockMovements()
+        public async Task<ActionResult<IEnumerable<StockMovementDTO>>> GetStockMovements()
         {
-            return await _context.StockMovements.ToListAsync();
+            return await _context.StockMovements
+                .Select(sm => new StockMovementDTO
+                {
+                    StockMovementId = sm.StockMovementId,
+                    TransactionDate = sm.TransactionDate,
+                    ProductId = sm.ProductId,
+                    Quantity = sm.Quantity,
+                    UnitPrice = sm.UnitPrice,
+                    TotalAmount = sm.TotalAmount,
+                    SourceDestinationId = sm.SourceDestinationId,
+                    Description = sm.Description,
+                    TransactionType = sm.TransactionType
+                })
+                .ToListAsync();
         }
 
         // GET: api/StockMovement/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StockMovement>> GetStockMovement(int id)
+        public async Task<ActionResult<StockMovementDTO>> GetStockMovement(int id)
         {
-            var stockMovement = await _context.StockMovements.FindAsync(id);
+            var stockMovement = await _context.StockMovements
+                .Select(sm => new StockMovementDTO
+                {
+                    StockMovementId = sm.StockMovementId,
+                    TransactionDate = sm.TransactionDate,
+                    ProductId = sm.ProductId,
+                    Quantity = sm.Quantity,
+                    UnitPrice = sm.UnitPrice,
+                    TotalAmount = sm.TotalAmount,
+                    SourceDestinationId = sm.SourceDestinationId,
+                    Description = sm.Description,
+                    TransactionType = sm.TransactionType
+                })
+                .FirstOrDefaultAsync(sm => sm.StockMovementId == id);
 
             if (stockMovement == null)
             {
@@ -43,14 +70,40 @@ namespace FiStockBackend.Controllers
         }
 
         // PUT: api/StockMovement/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStockMovement(int id, StockMovement stockMovement)
+        public async Task<IActionResult> PutStockMovement(int id, StockMovementDTO stockMovementDto)
         {
-            if (id != stockMovement.StockMovementId)
+            if (id != stockMovementDto.StockMovementId)
             {
                 return BadRequest();
             }
+
+            // Validate ProductId
+            if (!await _context.Products.AnyAsync(p => p.ProductId == stockMovementDto.ProductId))
+            {
+                return BadRequest("Invalid ProductId");
+            }
+
+            // Validate SourceDestinationId
+            if (!await _context.Warehouses.AnyAsync(w => w.WarehouseId == stockMovementDto.SourceDestinationId))
+            {
+                return BadRequest("Invalid SourceDestinationId");
+            }
+
+            var stockMovement = await _context.StockMovements.FindAsync(id);
+            if (stockMovement == null)
+            {
+                return NotFound();
+            }
+
+            stockMovement.TransactionDate = stockMovementDto.TransactionDate;
+            stockMovement.ProductId = stockMovementDto.ProductId;
+            stockMovement.Quantity = stockMovementDto.Quantity;
+            stockMovement.UnitPrice = stockMovementDto.UnitPrice;
+            stockMovement.TotalAmount = stockMovementDto.TotalAmount;
+            stockMovement.SourceDestinationId = stockMovementDto.SourceDestinationId;
+            stockMovement.Description = stockMovementDto.Description;
+            stockMovement.TransactionType = stockMovementDto.TransactionType;
 
             _context.Entry(stockMovement).State = EntityState.Modified;
 
@@ -74,14 +127,39 @@ namespace FiStockBackend.Controllers
         }
 
         // POST: api/StockMovement
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StockMovement>> PostStockMovement(StockMovement stockMovement)
+        public async Task<ActionResult<StockMovementDTO>> PostStockMovement(StockMovementDTO stockMovementDto)
         {
+            // Validate ProductId
+            if (!await _context.Products.AnyAsync(p => p.ProductId == stockMovementDto.ProductId))
+            {
+                return BadRequest("Invalid ProductId");
+            }
+
+            // Validate SourceDestinationId
+            if (!await _context.Warehouses.AnyAsync(w => w.WarehouseId == stockMovementDto.SourceDestinationId))
+            {
+                return BadRequest("Invalid SourceDestinationId");
+            }
+
+            var stockMovement = new StockMovement
+            {
+                TransactionDate = stockMovementDto.TransactionDate,
+                ProductId = stockMovementDto.ProductId,
+                Quantity = stockMovementDto.Quantity,
+                UnitPrice = stockMovementDto.UnitPrice,
+                TotalAmount = stockMovementDto.TotalAmount,
+                SourceDestinationId = stockMovementDto.SourceDestinationId,
+                Description = stockMovementDto.Description,
+                TransactionType = stockMovementDto.TransactionType
+            };
+
             _context.StockMovements.Add(stockMovement);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStockMovement", new { id = stockMovement.StockMovementId }, stockMovement);
+            stockMovementDto.StockMovementId = stockMovement.StockMovementId;
+
+            return CreatedAtAction(nameof(GetStockMovement), new { id = stockMovementDto.StockMovementId }, stockMovementDto);
         }
 
         // DELETE: api/StockMovement/5
