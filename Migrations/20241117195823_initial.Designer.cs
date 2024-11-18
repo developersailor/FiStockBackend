@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FiStockBackend.Migrations
 {
     [DbContext(typeof(StockTrackingDbContext))]
-    [Migration("20241117095615_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241117195823_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.0-rc.2.24474.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -44,32 +44,35 @@ namespace FiStockBackend.Migrations
 
             modelBuilder.Entity("FiStockBackend.Models.Customer", b =>
                 {
-                    b.Property<int>("CustomerCode")
+                    b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CustomerCode"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CustomerId"));
 
                     b.Property<string>("ContactInformation")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("CustomerCode")
+                        .HasColumnType("integer");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("CustomerCode");
+                    b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("FiStockBackend.Models.Product", b =>
                 {
-                    b.Property<int>("ProductCode")
+                    b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductCode"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
 
                     b.Property<string>("Barcode")
                         .IsRequired()
@@ -78,23 +81,19 @@ namespace FiStockBackend.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Image")
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("MinimumStockLevel")
-                        .HasColumnType("integer");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("PurchasePrice")
-                        .HasColumnType("numeric");
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<decimal>("SalePrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("SupplierCode")
+                    b.Property<int?>("StockMovementId")
                         .HasColumnType("integer");
 
                     b.Property<int>("SupplierId")
@@ -104,11 +103,11 @@ namespace FiStockBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ProductCode");
+                    b.HasKey("ProductId");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("SupplierCode");
+                    b.HasIndex("StockMovementId");
 
                     b.HasIndex("SupplierId");
 
@@ -124,15 +123,17 @@ namespace FiStockBackend.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StockMovementId"));
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ProductCode")
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
-
-                    b.Property<int?>("SourceDestinationId")
+                    b.Property<int>("SourceDestinationId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("TotalAmount")
@@ -159,13 +160,17 @@ namespace FiStockBackend.Migrations
 
             modelBuilder.Entity("FiStockBackend.Models.Supplier", b =>
                 {
-                    b.Property<int>("SupplierCode")
+                    b.Property<int>("SupplierId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SupplierCode"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SupplierId"));
 
                     b.Property<string>("ContactInformation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SupplierCode")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -173,7 +178,7 @@ namespace FiStockBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("SupplierCode");
+                    b.HasKey("SupplierId");
 
                     b.ToTable("Suppliers");
                 });
@@ -190,9 +195,6 @@ namespace FiStockBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PermissionLevel")
-                        .HasColumnType("integer");
-
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -204,11 +206,11 @@ namespace FiStockBackend.Migrations
 
             modelBuilder.Entity("FiStockBackend.Models.Warehouse", b =>
                 {
-                    b.Property<int>("WarehouseCode")
+                    b.Property<int>("WarehouseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WarehouseCode"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WarehouseId"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -218,11 +220,15 @@ namespace FiStockBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("WarehouseCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("WarehouseName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("WarehouseCode");
+                    b.HasKey("WarehouseId");
 
                     b.ToTable("Warehouses");
                 });
@@ -235,19 +241,19 @@ namespace FiStockBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FiStockBackend.Models.Supplier", "Supplier")
+                    b.HasOne("FiStockBackend.Models.StockMovement", "StockMovement")
                         .WithMany()
-                        .HasForeignKey("SupplierCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StockMovementId");
 
-                    b.HasOne("FiStockBackend.Models.Supplier", null)
+                    b.HasOne("FiStockBackend.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("StockMovement");
 
                     b.Navigation("Supplier");
                 });
@@ -257,13 +263,15 @@ namespace FiStockBackend.Migrations
                     b.HasOne("FiStockBackend.Models.Product", "Product")
                         .WithMany("StockMovements")
                         .HasForeignKey("ProductCode")
+                        .HasPrincipalKey("ProductCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FiStockBackend.Models.Warehouse", null)
                         .WithMany()
                         .HasForeignKey("SourceDestinationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Product");
                 });

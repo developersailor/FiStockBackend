@@ -2,7 +2,6 @@ using FiStockBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FiStockBackend.Context;
-
 public class StockTrackingDbContext : DbContext
 {
     public StockTrackingDbContext(DbContextOptions<StockTrackingDbContext> options) : base(options)
@@ -20,17 +19,18 @@ public class StockTrackingDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Supplier>()
-            .HasKey(s => s.SupplierCode);
+            .HasKey(s => s.SupplierId);
         modelBuilder.Entity<Customer>()
-            .HasKey(c => c.CustomerCode);
+            .HasKey(c => c.CustomerId);
         modelBuilder.Entity<Product>()
-            .HasKey(p => p.ProductCode);
+            .HasKey(p => p.ProductId);
         modelBuilder.Entity<Category>()
             .HasKey(c => c.CategoryId);
         modelBuilder.Entity<StockMovement>()
             .HasKey(sm => sm.StockMovementId);
         modelBuilder.Entity<Warehouse>()
-            .HasKey(w => w.WarehouseCode);
+            .HasKey(w => w.WarehouseId);
+
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)
             .WithMany(c => c.Products)
@@ -39,32 +39,23 @@ public class StockTrackingDbContext : DbContext
         modelBuilder.Entity<StockMovement>()
             .HasOne(sm => sm.Product)
             .WithMany(p => p.StockMovements)
-            .HasForeignKey(sm => sm.ProductCode);
+            .HasForeignKey(sm => sm.ProductCode)
+            .HasPrincipalKey(p => p.ProductCode);
 
         modelBuilder.Entity<StockMovement>()
             .HasOne<Warehouse>()
             .WithMany()
-            .HasForeignKey(sm => sm.SourceDestinationId);
-
-        modelBuilder.Entity<Warehouse>()
-            .HasMany<StockMovement>()
-            .WithOne()
             .HasForeignKey(sm => sm.SourceDestinationId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Product>()
-            .HasOne<Supplier>()
+            .HasOne(p => p.Supplier)
             .WithMany()
             .HasForeignKey(p => p.SupplierId);
 
         modelBuilder.Entity<Supplier>()
             .Property(s => s.SupplierCode)
             .IsRequired();
-
-        modelBuilder.Entity<Product>()
-            .HasMany(p => p.StockMovements)
-            .WithOne(sm => sm.Product)
-            .HasForeignKey(sm => sm.ProductCode);
 
         modelBuilder.Entity<Product>()
             .Property(p => p.SupplierId)

@@ -44,7 +44,7 @@ public class StockMovementService : IStockMovementService
         var existingStockMovement = await GetStockMovementByIdAsync(id);
         if (existingStockMovement == null)
         {
-            return null; // Return null if no value to return
+            return null;
         }
 
         existingStockMovement.TransactionDate = stockMovement.TransactionDate;
@@ -55,7 +55,7 @@ public class StockMovementService : IStockMovementService
         existingStockMovement.TotalAmount = stockMovement.TotalAmount;
         existingStockMovement.SourceDestinationId = stockMovement.SourceDestinationId;
         existingStockMovement.Description = stockMovement.Description;
-
+        existingStockMovement.Product = stockMovement.Product;
         await _context.SaveChangesAsync();
         return existingStockMovement;
     }

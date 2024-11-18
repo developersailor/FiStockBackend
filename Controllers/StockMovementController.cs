@@ -28,7 +28,15 @@ public class StockMovementController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddStockMovement([FromBody] StockMovement stockMovement)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         var addedStockMovement = await _stockMovementService.AddStockMovementAsync(stockMovement);
+        if (addedStockMovement == null)
+        {
+            return BadRequest("Failed to add stock movement.");
+        }
         return CreatedAtAction(nameof(GetStockMovementById), new { id = addedStockMovement.StockMovementId }, addedStockMovement);
     }
 

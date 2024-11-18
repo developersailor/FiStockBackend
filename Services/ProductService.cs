@@ -4,7 +4,6 @@ using FiStockBackend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FiStockBackend.Services;
-
 public class ProductService : IProductService
 {
     private readonly StockTrackingDbContext _context;
@@ -16,12 +15,17 @@ public class ProductService : IProductService
 
     public async Task<Product?> CreateProductAsync(Product? product)
     {
+        if (product == null)
+        {
+            throw new ArgumentNullException(nameof(product));
+        }
+
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
         return product;
     }
 
-    public async Task<Product> GetProductByIdAsync(int productCode)
+    public async Task<Product?> GetProductByIdAsync(int productCode)
     {
         return await _context.Products
             .Include(p => p.Category)
@@ -39,6 +43,11 @@ public class ProductService : IProductService
 
     public async Task UpdateProductAsync(Product? product)
     {
+        if (product == null)
+        {
+            throw new ArgumentNullException(nameof(product));
+        }
+
         _context.Products.Update(product);
         await _context.SaveChangesAsync();
     }
@@ -55,10 +64,9 @@ public class ProductService : IProductService
 
     public async Task<IEnumerable<Product>> GetProductsBySupplierIdAsync(int supplierId)
     {
-        var products = _context.Products
+        return await _context.Products
             .Include(p => p.Supplier)
             .Where(p => p.SupplierId == supplierId)
-            .ToList();
-        return products;
+            .ToListAsync();
     }
 }

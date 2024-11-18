@@ -2,6 +2,7 @@ namespace FiStockBackend.Models;
 
 public class Product
 {
+
     public int ProductId { get; set; }
     public required string ProductCode { get; set; }
     public int SupplierId { get; set; }
@@ -12,7 +13,7 @@ public class Product
     public Category Category { get; set; } = null!;
     public ICollection<StockMovement> StockMovements { get; set; } = new List<StockMovement>();
     public required string Unit { get; set; }
-
+    public StockMovement? StockMovement { get; set; }
     public required string SKU { get; set; }
 
 }
