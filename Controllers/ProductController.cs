@@ -1,69 +1,108 @@
-using FiStockBackend.Models;
-using FiStockBackend.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using FiStockBackend.Context;
+using FiStockBackend.Models;
 
-namespace FiStockBackend.Controllers;
-[Route("api/products")]
-[ApiController]
-public class ProductController : ControllerBase
+namespace FiStockBackend.Controllers
 {
-    private readonly IProductService _productService;
-
-    public ProductController(IProductService productService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProductController : ControllerBase
     {
-        _productService = productService;
-    }
+        private readonly StockTrackingDbContext _context;
 
-    [HttpPost]
-    public async Task<IActionResult> CreateProduct([FromBody] Product? product)
-    {
-        if (product == null)
+        public ProductController(StockTrackingDbContext context)
         {
-            return BadRequest("Product cannot be null.");
+            _context = context;
         }
 
-        var createdProduct = await _productService.CreateProductAsync(product);
-        if (createdProduct == null)
+        // GET: api/Product
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return StatusCode(500, "A problem happened while handling your request.");
-        }
-        return CreatedAtAction(nameof(GetProductById), new { productCode = createdProduct.ProductCode }, createdProduct);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAllProducts()
-    {
-        var products = await _productService.GetAllProductsAsync();
-        return Ok(products);
-    }
-
-    [HttpGet("{productCode}")]
-    public async Task<IActionResult> GetProductById(int productCode)
-    {
-        var product = await _productService.GetProductByIdAsync(productCode);
-        if (product == null)
-        {
-            return NotFound();
-        }
-        return Ok(product);
-    }
-
-    [HttpPut("{productCode}")]
-    public async Task<IActionResult> UpdateProduct(int productCode, [FromBody] Product? product)
-    {
-        if (product == null || productCode != int.Parse(product.ProductCode))
-        {
-            return BadRequest();
+            return await _context.Products.ToListAsync();
         }
 
-        await _productService.UpdateProductAsync(product);
-        return NoContent();
-    }
+        // GET: api/Product/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetProduct(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
 
-    [HttpDelete("{productCode}")]
-    public async Task<IActionResult> DeleteProduct(int productCode)
-    {
-        await _productService.DeleteProductAsync(productCode);
-        return NoContent();
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return product;
+        }
+
+        // PUT: api/Product/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutProduct(int id, Product product)
+        {
+            if (id != product.ProductId)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Product
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+        }
+
+        // DELETE: api/Product/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool ProductExists(int id)
+        {
+            return _context.Products.Any(e => e.ProductId == id);
+        }
     }
 }

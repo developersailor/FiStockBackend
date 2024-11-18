@@ -39,8 +39,7 @@ public class StockTrackingDbContext : DbContext
         modelBuilder.Entity<StockMovement>()
             .HasOne(sm => sm.Product)
             .WithMany(p => p.StockMovements)
-            .HasForeignKey(sm => sm.ProductCode)
-            .HasPrincipalKey(p => p.ProductCode);
+            .HasForeignKey(sm => sm.ProductId);
 
         modelBuilder.Entity<StockMovement>()
             .HasOne<Warehouse>()

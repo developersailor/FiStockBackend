@@ -12,47 +12,47 @@ namespace FiStockBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StockMovementController : ControllerBase
+    public class SupplierController : ControllerBase
     {
         private readonly StockTrackingDbContext _context;
 
-        public StockMovementController(StockTrackingDbContext context)
+        public SupplierController(StockTrackingDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/StockMovement
+        // GET: api/Supplier
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StockMovement>>> GetStockMovements()
+        public async Task<ActionResult<IEnumerable<Supplier>>> GetSuppliers()
         {
-            return await _context.StockMovements.ToListAsync();
+            return await _context.Suppliers.ToListAsync();
         }
 
-        // GET: api/StockMovement/5
+        // GET: api/Supplier/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StockMovement>> GetStockMovement(int id)
+        public async Task<ActionResult<Supplier>> GetSupplier(int id)
         {
-            var stockMovement = await _context.StockMovements.FindAsync(id);
+            var supplier = await _context.Suppliers.FindAsync(id);
 
-            if (stockMovement == null)
+            if (supplier == null)
             {
                 return NotFound();
             }
 
-            return stockMovement;
+            return supplier;
         }
 
-        // PUT: api/StockMovement/5
+        // PUT: api/Supplier/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStockMovement(int id, StockMovement stockMovement)
+        public async Task<IActionResult> PutSupplier(int id, Supplier supplier)
         {
-            if (id != stockMovement.StockMovementId)
+            if (id != supplier.SupplierId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(stockMovement).State = EntityState.Modified;
+            _context.Entry(supplier).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace FiStockBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StockMovementExists(id))
+                if (!SupplierExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace FiStockBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/StockMovement
+        // POST: api/Supplier
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StockMovement>> PostStockMovement(StockMovement stockMovement)
+        public async Task<ActionResult<Supplier>> PostSupplier(Supplier supplier)
         {
-            _context.StockMovements.Add(stockMovement);
+            _context.Suppliers.Add(supplier);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStockMovement", new { id = stockMovement.StockMovementId }, stockMovement);
+            return CreatedAtAction("GetSupplier", new { id = supplier.SupplierId }, supplier);
         }
 
-        // DELETE: api/StockMovement/5
+        // DELETE: api/Supplier/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStockMovement(int id)
+        public async Task<IActionResult> DeleteSupplier(int id)
         {
-            var stockMovement = await _context.StockMovements.FindAsync(id);
-            if (stockMovement == null)
+            var supplier = await _context.Suppliers.FindAsync(id);
+            if (supplier == null)
             {
                 return NotFound();
             }
 
-            _context.StockMovements.Remove(stockMovement);
+            _context.Suppliers.Remove(supplier);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool StockMovementExists(int id)
+        private bool SupplierExists(int id)
         {
-            return _context.StockMovements.Any(e => e.StockMovementId == id);
+            return _context.Suppliers.Any(e => e.SupplierId == id);
         }
     }
 }

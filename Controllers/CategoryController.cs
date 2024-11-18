@@ -12,47 +12,47 @@ namespace FiStockBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StockMovementController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly StockTrackingDbContext _context;
 
-        public StockMovementController(StockTrackingDbContext context)
+        public CategoryController(StockTrackingDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/StockMovement
+        // GET: api/Category
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StockMovement>>> GetStockMovements()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.StockMovements.ToListAsync();
+            return await _context.Categories.ToListAsync();
         }
 
-        // GET: api/StockMovement/5
+        // GET: api/Category/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StockMovement>> GetStockMovement(int id)
+        public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var stockMovement = await _context.StockMovements.FindAsync(id);
+            var category = await _context.Categories.FindAsync(id);
 
-            if (stockMovement == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return stockMovement;
+            return category;
         }
 
-        // PUT: api/StockMovement/5
+        // PUT: api/Category/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStockMovement(int id, StockMovement stockMovement)
+        public async Task<IActionResult> PutCategory(int id, Category category)
         {
-            if (id != stockMovement.StockMovementId)
+            if (id != category.CategoryId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(stockMovement).State = EntityState.Modified;
+            _context.Entry(category).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace FiStockBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StockMovementExists(id))
+                if (!CategoryExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace FiStockBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/StockMovement
+        // POST: api/Category
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StockMovement>> PostStockMovement(StockMovement stockMovement)
+        public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            _context.StockMovements.Add(stockMovement);
+            _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStockMovement", new { id = stockMovement.StockMovementId }, stockMovement);
+            return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
         }
 
-        // DELETE: api/StockMovement/5
+        // DELETE: api/Category/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStockMovement(int id)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
-            var stockMovement = await _context.StockMovements.FindAsync(id);
-            if (stockMovement == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            _context.StockMovements.Remove(stockMovement);
+            _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool StockMovementExists(int id)
+        private bool CategoryExists(int id)
         {
-            return _context.StockMovements.Any(e => e.StockMovementId == id);
+            return _context.Categories.Any(e => e.CategoryId == id);
         }
     }
 }
